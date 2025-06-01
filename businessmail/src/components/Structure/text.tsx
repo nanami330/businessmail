@@ -9,19 +9,21 @@ export default function Structure() {
         {/* 基本構造 */}
         <Card className="rounded-2xl border shadow-sm bg-white">
           <CardContent className="p-6 space-y-4">
-            <h2 className="text-xl font-semibold text-blue-600">📌 基本構造の流れ</h2>
+            <h2 className="text-xl font-semibold text-blue-600">基本構造</h2>
             <ol className="list-decimal list-inside space-y-1 text-gray-700">
-              <li>宛先（To, Cc, Bcc）</li>
-              <li>件名（要点が伝わるタイトル）</li>
-              <li>添付ファイル（必要な場合）</li>
-              <li>宛名（〇〇様など）</li>
-              <li>挨拶と名乗り（初めての場合や丁寧に始めたい場合）</li>
-              <li>本文・要旨（要点を明確に）</li>
-              <li>締めの挨拶（よろしくお願いいたします など）</li>
-              <li>署名（氏名・連絡先など）</li>
+              <li>宛先</li>
+              <li>件名</li>
+              <li>添付ファイル</li>
+              <li>宛名</li>
+              <li>挨拶と名乗り</li>
+              <li>本文</li>
+              <li>結びの言葉</li>
+              <li>署名</li>
             </ol>
           </CardContent>
         </Card>
+
+
 
         {/* メール例 */}
         <Card className="rounded-2xl border shadow-sm bg-white">

@@ -12,7 +12,7 @@ export default function Home() {
         </p>
 
         <div className="text-center mb-6">
-          <Link href="/material1" legacyBehavior>
+          <Link href="/Material1/Text" legacyBehavior>
             <a className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-full text-lg shadow-md">
               今すぐ学ぶ
             </a>
