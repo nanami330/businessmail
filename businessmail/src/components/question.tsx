@@ -1,8 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { saveTestResult } from "@/lib/saveTestResult";
+import { getTestResult } from "@/lib/testResult";
+import { useRouter } from "next/navigation"; // 🔹 追加
+
+const chapterId = "chapter5";
 
 const questions = [
   {
@@ -37,18 +42,38 @@ export default function Question() {
   const [score, setScore] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [showScore, setShowScore] = useState(false);
+  const [history, setHistory] = useState<any[]>([]);
+  const router = useRouter(); // 🔹 ページ遷移用
+
+  useEffect(() => {
+    if (showScore) {
+      getTestResult(chapterId)
+        .then(setHistory)
+        .catch((err) => console.error("履歴取得失敗:", err));
+    }
+  }, [showScore]);
 
   const handleAnswer = (option: string) => {
     setSelected(option);
     if (option === questions[current].answer) {
-      setScore(score + 1);
+      setScore((prev) => prev + 1);
     }
+
     setTimeout(() => {
       if (current + 1 < questions.length) {
-        setCurrent(current + 1);
+        setCurrent((prev) => prev + 1);
         setSelected(null);
       } else {
-        setShowScore(true);
+        const finalScore = score + (option === questions[current].answer ? 1 : 0);
+        saveTestResult(chapterId, finalScore)
+          .then((res) => {
+            if (!res.success) {
+              console.error("保存失敗:", res.error);
+            }
+          })
+          .finally(() => {
+            setShowScore(true);
+          });
       }
     }, 1000);
   };
@@ -56,22 +81,32 @@ export default function Question() {
   return (
     <div className="flex-[8] bg-[#f8fafc] min-h-screen p-8">
       <div className="max-w-xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-5">Chapter 5: クイズで復習</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-5">総合テスト</h1>
 
-        {showScore ? (
-          <Card>
-            <CardContent className="p-6 text-center space-y-4">
-              <h2 className="text-xl font-semibold text-blue-600">🎉 結果発表</h2>
-              <p className="text-lg">あなたのスコア: <span className="font-bold">{score} / {questions.length}</span></p>
-              <Button onClick={() => {
-                setCurrent(0);
-                setScore(0);
-                setSelected(null);
-                setShowScore(false);
-              }}>もう一度挑戦する</Button>
-            </CardContent>
-          </Card>
-        ) : (
+        {/* ▼ クイズ内容 or 結果表示 */}
+{showScore ? (
+  <Card>
+    <CardContent className="p-6 text-center space-y-4">
+      <h2 className="text-xl font-semibold text-blue-600">🎉 結果発表</h2>
+      <p className="text-lg">
+        あなたのスコア: <span className="font-bold">{score} / {questions.length}</span>
+      </p>
+      <Button onClick={() => {
+        setCurrent(0);
+        setScore(0);
+        setSelected(null);
+        setShowScore(false);
+      }}>もう一度挑戦する</Button>
+
+      <div className="mt-4">
+        <Button variant="outline" onClick={() => router.push("/TestHistory")}>
+          📚 テスト履歴を見る
+        </Button>
+      </div>
+    </CardContent>
+  </Card>
+) : (
+
           <Card>
             <CardContent className="p-6 space-y-4">
               <p className="text-sm text-gray-600">問題 {current + 1} / {questions.length}</p>
