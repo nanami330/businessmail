@@ -3,6 +3,12 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { saveTestResult } from "@/lib/saveTestResult";
+import { supabase } from "@/lib/supabaseClient";
+
+const { data: { user }, error } = await supabase.auth.getUser();
+console.log("ログインユーザー:", user);
 
 const questions = [
  {
@@ -37,6 +43,7 @@ export default function Question() {
   const [score, setScore] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [showScore, setShowScore] = useState(false);
+  const [isPerfect, setIsPerfect] = useState(false);
 
   const handleAnswer = (option: string) => {
     setSelected(option);
@@ -53,10 +60,25 @@ export default function Question() {
     }, 1000);
   };
 
+useEffect(() => {
+  if (showScore) {
+    (async () => {
+      const result = await saveTestResult("Chapter3", score);
+      if (result.success) {
+        console.log("保存成功");
+      } else {
+        console.error("保存失敗:", result.error?.message);
+      }
+    })();
+  }
+}, [showScore]);
+
   return (
     <div className="flex-[8] bg-[#f8fafc] min-h-screen p-8">
       <div className="max-w-xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-5">Chapter 3: 確認テスト</h1>
+       <h1 className="text-3xl font-bold text-gray-800 mb-5">
+  Chapter 3: 確認テスト 
+</h1>
 
         {showScore ? (
           <Card>

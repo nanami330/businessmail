@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { saveTestResult } from "@/lib/saveTestResult";
 
 const questions = [
    {
@@ -52,6 +54,19 @@ export default function Question() {
       }
     }, 1000);
   };
+
+    useEffect(() => {
+    if (showScore) {
+      (async () => {
+        const result = await saveTestResult("Chapter4", score);
+        if (result.success) {
+          console.log("保存成功");
+        } else {
+          console.error("保存失敗:", result.error?.message);
+        }
+      })();
+    }
+  }, [showScore]);
 
   return (
     <div className="flex-[8] bg-[#f8fafc] min-h-screen p-8">
