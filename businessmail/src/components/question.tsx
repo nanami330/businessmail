@@ -1,136 +1,144 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { saveTestResult } from "@/lib/saveTestResult";
-import { getTestResult } from "@/lib/testResult";
-import { useRouter } from "next/navigation"; // 🔹 追加
 
-const chapterId = "chapter5";
+const chapterId = "writingTestForm";
 
-const questions = [
-  {
-    question: "ビジネスメールの基本構造に含まれないものはどれ？",
-    options: ["挨拶", "要旨", "天気", "署名"],
-    answer: "天気",
-  },
-  {
-    question: "初対面の相手にメールを送るとき、最も適切な表現は？",
-    options: ["どうも！", "初めまして。△△の〇〇と申します。", "よろしくね", "何かあれば教えて"],
-    answer: "初めまして。△△の〇〇と申します。",
-  },
-  {
-    question: "謝罪メールで避けるべき表現は？",
-    options: ["申し訳ございません", "今後このようなことがないように", "確認いたします", "まあ大丈夫かと思います"],
-    answer: "まあ大丈夫かと思います",
-  },
-  {
-    question: "以下のうち、正しい敬語表現はどれ？",
-    options: ["伺わせていただきます", "行かせてやります", "来てくれる？", "見ることができる"],
-    answer: "伺わせていただきます",
-  },
-  {
-    question: "日程調整メールでの適切な言い回しはどれ？",
-    options: ["この日しか無理です", "あなたの都合に合わせます", "以下よりご都合の良い日をご教示ください", "どっちでもいいです"],
-    answer: "以下よりご都合の良い日をご教示ください",
-  },
-];
+export default function WritingTestForm() {
+  const [to, setTo] = useState("");
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [signature, setSignature] = useState("");
+  const [score, setScore] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
-export default function Question() {
-  const [current, setCurrent] = useState(0);
-  const [score, setScore] = useState(0);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [showScore, setShowScore] = useState(false);
-  const [history, setHistory] = useState<any[]>([]);
-  const router = useRouter(); // 🔹 ページ遷移用
+  const handleSubmit = () => {
+    const result = evaluate(to, subject, body, signature);
+    setScore(result.total);
+    setFeedback(result.feedback);
+    setSubmitted(true);
+  };
 
   useEffect(() => {
-    if (showScore) {
-      getTestResult(chapterId)
-        .then(setHistory)
-        .catch((err) => console.error("履歴取得失敗:", err));
+    if (submitted && score !== null) {
+      (async () => {
+        const res = await saveTestResult(chapterId, score);
+        if (res.success) {
+          console.log("保存成功");
+        } else {
+          console.error("保存失敗:", res.error?.message);
+        }
+      })();
     }
-  }, [showScore]);
-
-  const handleAnswer = (option: string) => {
-    setSelected(option);
-    if (option === questions[current].answer) {
-      setScore((prev) => prev + 1);
-    }
-
-    setTimeout(() => {
-      if (current + 1 < questions.length) {
-        setCurrent((prev) => prev + 1);
-        setSelected(null);
-      } else {
-        const finalScore = score + (option === questions[current].answer ? 1 : 0);
-        saveTestResult(chapterId, finalScore)
-          .then((res) => {
-            if (!res.success) {
-              console.error("保存失敗:", res.error);
-            }
-          })
-          .finally(() => {
-            setShowScore(true);
-          });
-      }
-    }, 1000);
-  };
+  }, [submitted, score]);
 
   return (
     <div className="flex-[8] bg-[#f8fafc] min-h-screen p-8">
       <div className="max-w-xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-5">総合テスト</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-5">実践メールライティングテスト</h1>
 
-        {/* ▼ クイズ内容 or 結果表示 */}
-{showScore ? (
-  <Card>
-    <CardContent className="p-6 text-center space-y-4">
-      <h2 className="text-xl font-semibold text-blue-600">🎉 結果発表</h2>
-      <p className="text-lg">
-        あなたのスコア: <span className="font-bold">{score} / {questions.length}</span>
-      </p>
-      <Button onClick={() => {
-        setCurrent(0);
-        setScore(0);
-        setSelected(null);
-        setShowScore(false);
-      }}>もう一度挑戦する</Button>
+        <Card>
+          <CardContent className="p-6 space-y-6">
 
-      <div className="mt-4">
-        <Button variant="outline" onClick={() => router.push("/TestHistory")}>
-          📚 テスト履歴を見る
-        </Button>
-      </div>
-    </CardContent>
-  </Card>
-) : (
+            <p className="text-lg font-semibold text-gray-700">
+              【お題】<br />
+              あなたは株式会社〇〇の営業担当です。<br />
+              取引先の株式会社△△の田中様に、先日依頼していた資料の送付をお願いするメールを書いてください。
+            </p>
 
-          <Card>
-            <CardContent className="p-6 space-y-4">
-              <p className="text-sm text-gray-600">問題 {current + 1} / {questions.length}</p>
-              <h2 className="text-lg font-semibold text-gray-800">{questions[current].question}</h2>
-              <div className="grid gap-2">
-                {questions[current].options.map((option, i) => (
-                  <Button
-                    key={i}
-                    onClick={() => handleAnswer(option)}
-                    className={`justify-start w-full text-left px-4 py-2 border rounded-md 
-                      ${selected && option === questions[current].answer && "bg-green-100 border-green-400 text-black"} 
-                      ${selected && option === selected && option !== questions[current].answer && "bg-red-100 border-red-400 text-black"} 
-                      ${!selected && "bg-white text-black hover:bg-blue-50 border-gray-400"}
-                    `}
-                    disabled={!!selected}
-                  >
-                    {option}
-                  </Button>
-                ))}
+            <div className="space-y-3">
+              <div>
+                <label>宛先（To）</label>
+                <Input value={to} onChange={(e) => setTo(e.target.value)} disabled={submitted} />
               </div>
-            </CardContent>
-          </Card>
-        )}
+
+              <div>
+                <label>件名</label>
+                <Input value={subject} onChange={(e) => setSubject(e.target.value)} disabled={submitted} />
+              </div>
+
+              <div>
+                <label>本文</label>
+                <Textarea rows={10} value={body} onChange={(e) => setBody(e.target.value)} disabled={submitted} />
+              </div>
+
+              <div>
+                <label>署名</label>
+                <Textarea rows={3} value={signature} onChange={(e) => setSignature(e.target.value)} disabled={submitted} />
+              </div>
+            </div>
+
+            {!submitted ? (
+              <Button onClick={handleSubmit} className="w-full bg-blue-500 hover:bg-blue-600">採点する</Button>
+            ) : (
+              <>
+                <p className="text-xl text-center">あなたのスコア: <span className="font-bold">{score} / 10</span></p>
+                <p className="mt-3 text-md text-gray-700">{feedback}</p>
+
+                <div className="mt-6 p-4 bg-gray-100 rounded-md">
+      <h3 className="text-lg font-bold text-blue-600 mb-2">模範解答</h3>
+
+      <div className="space-y-2 text-left">
+        <p><strong>宛先:</strong> 株式会社△△ 田中様</p>
+        <p><strong>件名:</strong> 資料ご送付のお願い</p>
+        <p><strong>本文:</strong><br />
+          お世話になっております。株式会社〇〇の〇〇でございます。<br />
+          先日はお打ち合わせのお時間を頂き、誠にありがとうございました。<br />
+          先日お願いしておりました○○に関する資料につきまして、恐れ入りますがご送付いただけますと幸いです。<br />
+          お手数をおかけしますが、何卒よろしくお願い申し上げます。
+        </p>
+        <p><strong>署名:</strong><br />
+          株式会社〇〇<br />
+          営業部 〇〇<br />
+          TEL: 03-1234-5678<br />
+          Email: example@example.com
+        </p>
+      </div>
+    </div>
+
+    <Button onClick={() => {
+      setSubmitted(false);
+      setTo("");
+      setSubject("");
+      setBody("");
+      setSignature("");
+      setScore(null);
+      setFeedback("");
+    }} className="w-full mt-6 bg-green-400 hover:bg-green-500">
+      もう一度挑戦する
+    </Button>
+  </>
+)}
+
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
+}
+
+// 採点ロジック
+function evaluate(to: string, subject: string, body: string, signature: string) {
+  let total = 0;
+  let feedback = "";
+
+  if (to.includes("田中")) total += 1; else feedback += "✔ 宛先に宛名が不足しています。\n";
+  if (subject.includes("資料")) total += 1; else feedback += "✔ 件名に資料送付依頼が反映されていません。\n";
+  if (body.match(/お世話になっております/)) total += 2; else feedback += "✔ 挨拶が不足しています。\n";
+  if (body.match(/資料.*(送付|お送り)/)) total += 3; else feedback += "✔ 依頼内容が明確ではありません。\n";
+  if (body.match(/よろしくお願いいたします|ご確認お願いいたします|よろしくお願い申し上げます/)) total += 2; else feedback += "✔ 結びが弱いです。\n";
+  if (signature.length >= 5) total += 1; else feedback += "✔ 署名が短すぎます。\n";
+
+  if (total >= 10) {
+    feedback = "完璧です！自然で丁寧なビジネスメールが書けています。";
+    total = 10; // 上限
+  }
+
+  return { total, feedback };
 }
