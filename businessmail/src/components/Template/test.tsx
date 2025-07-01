@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { saveTestResult } from "@/lib/saveTestResult";
+import Image from "next/image";
 
 // 正規化関数：ゆれ吸収
 const normalize = (str: string): string => {
@@ -108,13 +109,16 @@ export default function Question() {
       <div className="max-w-xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-800 mb-5">Chapter 4: 空欄補充マナー問題（解説付き完全版）</h1>
 
-      // 中略（※あなたのコードとほぼ同じ、ここまで完璧です）
-
 {showScore ? (
   <Card>
-    <CardContent className="p-6 text-center space-y-6">
+    <CardContent className="p-6 text-center space-y-3">
       <div className="flex justify-center text-5xl">
-        {score === questions.length ? "🎯" : score >= 4 ? "🎉" : "💪"}
+        {score === questions.length ? "🎯" : score >= 4 ? "🎉" :  
+                      <Image src="/sad.png"
+                          width={200}
+                          height={200}
+                         className="text-5xl"
+                         alt="sad"></Image>}
       </div>
       <h2 className="text-2xl font-bold text-blue-600">結果発表</h2>
       <p className="text-xl">
@@ -163,30 +167,34 @@ export default function Question() {
                 </>
               ) : (
                 <>
-                  {isCorrect ? (
-  <p className="text-green-600 font-semibold">正解！</p>
-) : (
-  <>
-    <p className="text-red-600 font-semibold">不正解</p>
-    <div className="text-gray-700 text-sm mt-2">
-      {questions[current].answers.map((ans, idx) => (
-        <div key={idx}>（{idx + 1}）正解：{ans}</div>
-      ))}
-    </div>
-  </>
-)}
+           {isCorrect ? (
+                <p className="text-green-600 font-semibold">正解！</p>
+              ) : (
+                <>
+                  <p className="text-red-600 font-semibold">不正解</p>
+                  <div className="text-gray-700 text-sm mt-2">
+                    {questions[current].answers.map((ans, idx) => (
+                      <div key={idx}>（{idx + 1}）正解：{ans}</div>
+                    ))}
+                  </div>
+                </>
+              )}
+                  <div className="mt-4 space-y-2 border-t border-gray-300 pt-4">
+                    <h3 className="text-sm text-black font-semibold">💡 解説</h3>
+                    <p className="text-gray-800 text-base">{questions[current].explanation}</p>
+                  </div>
 
-{!showExplanation && (
-  <Button onClick={() => setShowExplanation(true)} className="w-full bg-red-400 hover:bg-red-500 mt-2">
-    解説を見る
-  </Button>
-)}
+                 {current + 1 < questions.length ? (
+                    <Button onClick={handleNext} className="w-full mt-4 bg-blue-400 hover:bg-blue-500">
+                      次へ
+                    </Button>
+                  ) : (
+                    <Button onClick={() => setShowScore(true)} className="w-full mt-4 bg-blue-500 hover:bg-blue-600">
+                      結果を表示する
+                    </Button>
+                  )}
 
-{showExplanation && (
-  <p className="text-md text-gray-700 mt-2">{questions[current].explanation}</p>
-)}
 
-<Button onClick={handleNext} className="w-full mt-4 bg-blue-400 hover:bg-blue-500">次へ</Button>
 
                 </>
               )}
