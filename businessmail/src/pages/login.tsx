@@ -20,6 +20,21 @@ export default function LoginPage() {
     if (error) {
       setErrorMsg(error.message);
     } else {
+      const userId = data.user?.id;
+    if (userId) {
+      const { error: sessionError } = await supabase
+        .from('study_sessions')
+        .insert([
+          {
+            user_id: userId,
+            started_at: new Date(),
+          },
+        ]);
+
+      if (sessionError) {
+        console.error("学習セッションの記録に失敗:", sessionError.message);
+      }
+    }
       router.push('/Material1/Text');
     }
   };

@@ -4,52 +4,39 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { saveTestResult } from "@/lib/saveTestResult";
+import { supabase } from "@/lib/supabaseClient";
+import { useUser } from "@supabase/auth-helpers-react"; 
+import Image from "next/image";
 
 const questions = [
   {
-    question: "以下の文を敬語に直してください：「よろしくね！」",
-    answers: [
-      "何卒よろしくお願いいたします。",
-      "よろしくお願いいたします。",
-      "どうぞよろしくお願いいたします。",
-      "宜しくお願いいたします。",
-    ],
+    question: "「はじめまして、よろしくお願いします。」\nこのメール冒頭の表現を、ビジネスメールとして適切な敬語に直してください。",
+    answers: ["初めてメールにてご連絡申し上げます。", "初めてご連絡申し上げます。"],
+    explanation: "「はじめまして、よろしくお願いします。」はカジュアルな表現であり、ビジネスメールの冒頭では不適切です。「初めてメールにてご連絡申し上げます」や「初めてご連絡申し上げます」のように丁寧な書き出しにしましょう。"
   },
   {
-    question: "以下の文を敬語に直してください：「わかったら教えて！」",
-    answers: [
-      "お分かりになりましたらお知らせください。",
-      "ご理解いただけましたらご連絡ください。",
-      "お分かりでしたらお知らせください。",
-    ],
+    question: "「おっしゃられました」は敬語として不適切です。\n正しい形に直してください。",
+    answers: ["おっしゃった"],
+    explanation: "「おっしゃられました」は「おっしゃる」と「られる」が重なった二重敬語です。正しくは「おっしゃった」とシンプルに使います。"
   },
   {
-    question: "以下の文を敬語に直してください：「この件、確認しといて！」",
-    answers: [
-      "こちらの件、ご確認をお願いいたします。",
-       "こちらの件、ご確認お願いいたします。",
-      "この件、ご確認お願いいたします。",
-       "この件、ご確認をお願いいたします。",
-      "ご確認のほどよろしくお願いいたします。",
-    ],
+    question: "「拝見させていただきます」は敬語として不適切です。\n適切な表現に直してください。",
+    answers: ["拝見します"],
+    explanation: "「拝見させていただきます」は「拝見する（謙譲語）」に「させていただく（謙譲語）」が重なり、過剰な敬語になります。正しくは「拝見します」で十分丁寧です。"
   },
   {
-    question: "以下の文を敬語に直してください：「手伝ってくれて助かったよ！」",
-    answers: [
-      "お手伝いいただき助かりました。",
-      "お力添えいただきありがとうございました。",
-      "ご協力いただき助かりました。",
-    ],
+    question: "依頼メールを送るとき、次のどのクッション言葉が適切ですか？\n\n（例）○○の件、対応をお願いします。",
+    answers: ["お忙しいところ恐れ入りますが"],
+    explanation: "「お忙しいところ恐れ入りますが」は相手の都合に配慮した丁寧なクッション言葉です。依頼やお願いをする際に適切に使えます。"
   },
   {
-    question: "以下の文を敬語に直してください：「今日、来てくれてありがとう！」",
-    answers: [
-      "本日はお越しいただきありがとうございます。",
-      "本日はご来場いただきありがとうございます。",
-      "本日はご足労いただきありがとうございます。",
-    ],
-  },
+    question: "「すみませんが…」のカジュアルな表現を、丁寧なビジネス表現に言い換えてください。",
+    answers: ["恐れ入りますが…"],
+    explanation: "「すみませんが…」はカジュアルな言い回しで、ビジネスの場では「恐れ入りますが…」や「恐縮ですが…」のように言い換えるのが望ましいです。"
+  }
 ];
+
+
 
 // 正規化（句読点・空白削除）
 const normalize = (text: string) => {
@@ -109,6 +96,51 @@ export default function Question() {
     }
   }, [showScore]);
 
+  const user = useUser();
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  useEffect(() => {
+  const startSession = async () => {
+    if (!user?.id) return;
+    const { data, error } = await supabase
+      .from("study_sessions")
+      .insert([
+        {
+          user_id: user.id,
+          started_at: new Date(),
+        },
+      ])
+      .select()
+      .single();
+
+    if (data) {
+      setSessionId(data.id);
+    } else {
+      console.error("学習開始の記録に失敗:", error?.message);
+    }
+  };
+
+  startSession();
+}, [user]);
+
+useEffect(() => {
+  const endSession = async () => {
+    if (!sessionId) return;
+    await supabase
+      .from("study_sessions")
+      .update({ ended_at: new Date() })
+      .eq("id", sessionId);
+  };
+
+  // 離脱時に呼ばれる
+  window.addEventListener("beforeunload", endSession);
+  return () => {
+    endSession();
+    window.removeEventListener("beforeunload", endSession);
+  };
+}, [sessionId]);
+
+ 
+
   return (
     <div className="flex-[8] bg-[#f8fafc] min-h-screen p-8">
       <div className="max-w-xl mx-auto">
@@ -116,14 +148,18 @@ export default function Question() {
 
         {showScore ? (
   <Card>
-    <CardContent className="p-8 text-center space-y-6">
+    <CardContent className="p-8 text-center space-y-3">
       <div className="flex justify-center">
         {score === questions.length ? (
           <div className="text-5xl">🎯</div>
         ) : score >= questions.length * 0.8 ? (
           <div className="text-5xl">🎉</div>
         ) : (
-          <div className="text-5xl">💪</div>
+          <Image src="/sad.png"
+                  width={200}
+                  height={200}
+                 className="text-5xl"
+                 alt="sad"></Image>
         )}
       </div>
       <h2 className="text-2xl font-bold text-blue-600">結果発表</h2>
@@ -181,16 +217,31 @@ export default function Question() {
                     <p className="text-lg text-green-600">正解！</p>
                   ) : (
                     <>
-                      <p className="text-lg text-red-600">不正解。</p>
-                      {!showExplanation && (
-                        <Button onClick={() => setShowExplanation(true)} className="w-full bg-red-400 hover:bg-red-500">解説を見る</Button>
-                      )}
-                      {showExplanation && (
-                        <p className="text-md text-gray-700 mt-2">正しい答え例: {questions[current].answers[0]}</p>
-                      )}
-                    </>
+                      <p className="text-lg text-red-600">不正解。  
+                          <div className="mt-2">
+                            <h4 className="text-sm text-black font-semibold">✅ 正解例</h4>
+                            <p className="text-gray-800 text-base">
+                              {questions[current].answers}
+                            </p>
+                          </div>
+                        </p>
+                     <div className="mt-4 space-y-2 border-t border-gray-300 pt-4">
+                      <h3 className="text-sm text-black font-semibold">💡 解説</h3>
+                      <p className="text-gray-800 text-base">
+                         {questions[current].explanation}
+                      </p>
+                    </div>
+                                      </>
                   )}
-                  <Button onClick={handleNext} className="w-full mt-2 bg-blue-400 hover:bg-blue-500">次へ</Button>
+                   {current + 1 < questions.length ? (
+                                      <Button onClick={handleNext} className="w-full mt-4 bg-blue-400 hover:bg-blue-500">
+                                        次へ
+                                      </Button>
+                                    ) : (
+                                      <Button onClick={() => setShowScore(true)} className="w-full mt-4 bg-blue-500 hover:bg-blue-600">
+                                        結果を表示する
+                                      </Button>
+                                    )}
                 </>
               )}
             </CardContent>

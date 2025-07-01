@@ -102,74 +102,66 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed top-0 left-0 w-64 h-screen bg-[#f8fafc] border-r px-4 py-6 z-50 flex flex-col justify-start overflow-y-auto">
-      <nav>
-        <ul className="space-y-1">
-          {links.map(({ id, href, label, icon, tooltips }, index) => {
-            const isOpen = openIndex === index;
+   <aside className="fixed top-16 left-0 w-64 h-screen bg-[#f8fafc] border-r px-4 py-6 z-50 flex flex-col justify-between overflow-y-auto">
+  {/* 上部: ナビゲーション */}
+  <nav>
+    <ul className="space-y-1">
+      {links.map(({ id, href, label, icon, tooltips }, index) => {
+        const isOpen = openIndex === index;
 
-            return (
-              <li key={href}>
-                {/* メイン項目 */}
-                <button
-                  onClick={() => setOpenIndex(isOpen ? null : index)}
-                  className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-gray-800 hover:bg-[#e0ebf5] hover:shadow-md transition-all"
-                >
-                  <span className="text-blue-600">{icon}</span>
-                  <span className="text-base font-medium">{label}</span>
-                </button>
+        return (
+          <li key={href}>
+            <button
+              onClick={() => setOpenIndex(isOpen ? null : index)}
+              className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-gray-800 hover:bg-[#e0ebf5] hover:shadow-md transition-all"
+            >
+              <span className="text-blue-600">{icon}</span>
+              <span className="text-base font-medium">{label}</span>
+            </button>
 
-                {/* 展開メニュー */}
-                <div
-                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                    isOpen ? "max-h-40 opacity-100 mt-2" : "max-h-0 opacity-0"
-                  }`}
-                >
-                  <div className="flex flex-col space-y-2 px-6 py-2">
-                    {tooltips.map(({ label: tipLabel, href: tipHref }) => {
-                      const isTestLink = tipLabel.includes("確認テスト");
-                      const showCheck =
-                        isTestLink && perfectChapters[id] === true;
+            <div
+              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                isOpen ? "max-h-40 opacity-100 mt-2" : "max-h-0 opacity-0"
+              }`}
+            >
+              <div className="flex flex-col space-y-2 px-6 py-2">
+                {tooltips.map(({ label: tipLabel, href: tipHref }) => {
+                  const isTestLink = tipLabel.includes("確認テスト");
+                  const showCheck = isTestLink && perfectChapters[id] === true;
 
-                      return (
-                        <Link
-                          key={tipHref}
-                          href={tipHref}
-                          className="block bg-blue-100 text-blue-900 text-sm px-3 py-2 rounded hover:bg-blue-200 transition"
-                        >
-                          {tipLabel} {showCheck ? "✅" : ""}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+                  return (
+                    <Link
+                      key={tipHref}
+                      href={tipHref}
+                      className="block bg-blue-100 text-blue-900 text-sm px-3 py-2 rounded hover:bg-blue-200 transition"
+                    >
+                      {tipLabel} {showCheck ? "✅" : ""}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  </nav>
 
-      {/* 総合テストボタン */}
-      <div className="mt-3 bg-white border border-red-200 rounded-xl p-4 shadow-sm hover:shadow-md transition">
-        <Link
-          href={quizeLink.href}
-          className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-all font-semibold justify-center"
-        >
-          {quizeLink.icon}
-          <span className="text-base">{quizeLink.label}</span>
-        </Link>
-      </div>
+  {/* 下部: テストボタン & ホームボタン */}
+  <div className="mt-2">
+    {/* 総合テストボタン */}
+    <div className="bg-white border border-red-200 rounded-xl p-4 shadow-sm hover:shadow-md transition mb-18">
+      <Link
+        href={quizeLink.href}
+        className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-all font-semibold justify-center"
+      >
+        {quizeLink.icon}
+        <span className="text-base">{quizeLink.label}</span>
+      </Link>
+    </div>
 
-      {/* ホームボタン */}
-      <div className="mt-48">
-        <Link
-          href={homeLink.href}
-          className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 hover:shadow-lg transition-all font-semibold justify-center"
-        >
-          {homeLink.icon}
-          <span className="text-base">{homeLink.label}</span>
-        </Link>
-      </div>
-    </aside>
+  </div>
+</aside>
+
   );
 }
