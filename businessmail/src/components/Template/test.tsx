@@ -107,7 +107,7 @@ export default function Question() {
   return (
     <div className="flex-[8] bg-[#f8fafc] min-h-screen p-8">
       <div className="max-w-xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-5">Chapter 4: 空欄補充マナー問題（解説付き完全版）</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-5">Chapter 4: 空欄補充マナー問題</h1>
 
 {showScore ? (
   <Card>
