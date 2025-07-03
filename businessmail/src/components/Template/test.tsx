@@ -113,7 +113,18 @@ export default function Question() {
   <Card>
     <CardContent className="p-6 text-center space-y-3">
       <div className="flex justify-center text-5xl">
-        {score === questions.length ? "🎯" : score >= 4 ? "🎉" :  
+        {score === questions.length ? <Image src="/pass.png"
+                                          width={200}
+                                          height={200}
+                                         className="text-5xl"
+                                         alt="sad"></Image>
+                                         : score >= 4 ? 
+                                         <Image src="/pass.png"
+                                          width={200}
+                                          height={200}
+                                         className="text-5xl"
+                                         alt="sad"></Image>
+                                         :  
                       <Image src="/sad.png"
                           width={200}
                           height={200}
