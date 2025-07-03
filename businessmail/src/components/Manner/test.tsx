@@ -115,7 +115,17 @@ export default function Question() {
           <Card>
             <CardContent className="p-6 text-center space-y-3">
               <div className="flex justify-center text-5xl">
-                {score === questions.length ? "🎯" : score >= 4 ? "🎉" :  
+                {score === questions.length ? 
+                <Image src="/pass.png"
+                                  width={200}
+                                  height={200}
+                                 className="text-5xl"
+                                 alt="sad"></Image> : score >= 4 ? 
+                <Image src="/pass.png"
+                                  width={200}
+                                  height={200}
+                                 className="text-5xl"
+                                 alt="sad"></Image> :  
                 <Image src="/sad.png"
                                   width={200}
                                   height={200}
@@ -126,7 +136,7 @@ export default function Question() {
               <p className="text-xl">あなたのスコア： <span className="font-bold text-3xl">{score} / {questions.length}</span></p>
               <p className="text-lg text-gray-700">
                 {score === questions.length
-                  ? "完璧です！素晴らしい敬語力！"
+                  ? "完璧です！マナー大事！"
                   : score >= 4
                   ? "とても良い成績です！もう少しで満点！"
                   : "復習してさらにレベルアップしましょう！"}
