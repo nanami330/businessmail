@@ -126,7 +126,7 @@ export default function Question() {
       </p>
       <p className="text-lg text-gray-700">
         {score === questions.length
-          ? "完璧です！素晴らしい敬語力！"
+          ? "完璧です！これでどんなパターンのメールでもばっちりです！"
           : score >= 4
           ? "とても良い成績です！もう少しで満点！"
           : "復習してさらにレベルアップしましょう！"}

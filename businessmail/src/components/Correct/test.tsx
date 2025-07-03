@@ -31,7 +31,7 @@ const questions = [
   },
   {
     question: "「すみませんが…」のカジュアルな表現を、丁寧なビジネス表現に言い換えてください。",
-    answers: ["恐れ入りますが…"],
+    answers: ["恐れ入りますが…","恐れ入りますが","恐縮ですが…", "恐縮ですが"],
     explanation: "「すみませんが…」はカジュアルな言い回しで、ビジネスの場では「恐れ入りますが…」や「恐縮ですが…」のように言い換えるのが望ましいです。"
   }
 ];
@@ -151,7 +151,11 @@ useEffect(() => {
     <CardContent className="p-8 text-center space-y-3">
       <div className="flex justify-center">
         {score === questions.length ? (
-          <div className="text-5xl">🎯</div>
+          <Image src="/pass.png"
+                  width={200}
+                  height={200}
+                 className="text-5xl"
+                 alt="sad"></Image>
         ) : score >= questions.length * 0.8 ? (
           <div className="text-5xl">🎉</div>
         ) : (
