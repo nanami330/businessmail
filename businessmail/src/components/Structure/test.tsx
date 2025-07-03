@@ -138,11 +138,13 @@ export default function DragSortQuestion() {
         {showScore ? (
           <Card>
             <CardContent className="p-6 text-center space-y-6">
+            <div className="flex justify-center">
               <Image src="/pass.png"
                  width={200}
                  height={200}
                  className="text-5xl"
                  alt="sad"></Image>
+                 </div>
               <h2 className="text-2xl font-bold text-blue-600">結果発表</h2>
               <p className="text-xl">あなたのスコア：<span className="font-bold text-3xl">{score} / 5</span></p>
               <p className="text-lg text-gray-700">完璧です！メールの構造をしっかり理解しています！</p>
