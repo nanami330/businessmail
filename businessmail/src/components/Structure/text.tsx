@@ -5,7 +5,7 @@ export default function Template() {
     <div className="flex-[8] bg-[#f1f5f9] min-h-screen p-8">
       <div className="flex flex-col gap-6 max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-800">
-          Chapter 1: メール基本構造造
+          Chapter 1: メール基本構造
         </h1>
 
         <Card className="rounded-2xl border shadow-sm bg-white">
